@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wild West Online Doctor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Comic Sans */
+            background-image: url('/images/wild-west-background-pz8gao1b0xsa1we4.jpg'); /* Correct path to public folder */
+            background-size: cover;
+            margin: 0;
+            padding: 20px;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255); /* Semi-transparent orange (sunset color) */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border: 2px solid #8B4513; /* SaddleBrown border */
+        }
+        h1 {
+            text-align: center;
+            color: #8B4513; /* SaddleBrown */
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7); /* Subtle white glow for text */
+        }
+        .messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #8B4513; /* Darker brown border */
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 228, 196, 0.6); /* Light sand-beige background */
+        }
+        .message {
+            margin: 10px 0;
+        }
+        .user-message {
+            text-align: right;
+            color: black; /* DarkSlateBlue text for user messages */
+        }
+        .gpt-message {
+            text-align: left;
+            color: #D2691E; /* Chocolate color for GPT messages */
+        }
+        .input-container {
+            display: flex;
+        }
+        textarea {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #8B4513;
+            border-radius: 4px;
+            resize: none;
+            background: #FFF5EE; /* Seashell background */
+            color: #8B4513; /* SaddleBrown text */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Comic Sans for textarea */
+        }
+        button {
+            padding: 10px;
+            margin-left: 5px;
+            background-color: #CD853F; /* Peru button color */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #8B4513; /* SaddleBrown on hover */
+        }
+    </style>        
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Wild West Doctor</h1>
+        <div class="messages" id="messages"></div>
+        <div class="input-container">
+            <textarea id="userInput" rows="2" placeholder="Howdy partner, What brings ya in?" required></textarea>
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const messagesDiv = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+
+        sendButton.addEventListener('click', async () => {
+            const userMessage = userInput.value.trim();
+            if (!userMessage) return;
+
+            // Display user message
+            displayMessage(userMessage, 'user');
+
+            // Clear input
+            userInput.value = '';
+
+            // Send request to the server
+            const response = await fetch('/prompt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ ailment: userMessage })
+            });
+
+            const data = await response.json();
+            const gptMessage = data.response;
+
+            // Display GPT response
+            displayMessage(gptMessage, 'gpt');
+        });
+
+        function displayMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + (sender === 'user' ? 'user-message' : 'gpt-message');
+            messageDiv.textContent = message;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Scroll to the bottom
+        }
+    </script>
+</body>
+</html>
